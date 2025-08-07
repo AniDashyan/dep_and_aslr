@@ -34,21 +34,13 @@ elseif(WIN32 AND MSVC)
 endif()
 
 # Custom targets
-add_custom_target(_dep
+add_custom_target(test_dep
     COMMAND main
     DEPENDS main
 )
 
-if (WIN32)
-    set(EXIT VER>NUL)
-else()
-    set(EXIT true)
-endif()
-
-
-
 add_custom_target(test_aslr
-    COMMAND echo "n" | main || EXIT
-    COMMAND echo "n" | main || EXIT  
+    COMMAND echo "n" | $<TARGET_FILE:main> || true
+    COMMAND echo "n" | $<TARGET_FILE:main> || true  
     DEPENDS main
 )

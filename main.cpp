@@ -123,7 +123,8 @@ int main() {
     if (choice == 'y' || choice == 'Y') {
         demo_dep();
     } else {
-        std::cout << "Skipping DEP demo" << std::endl;
+        std::cout << "WARNING: DEP is disabled" << std::endl;
+        demo_dep(); // Still call to show the code, but it won't execute
     }
     
     std::cout << "\nProgram completed successfully!" << std::endl;
