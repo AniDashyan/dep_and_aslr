@@ -16,7 +16,7 @@ add_executable(main_protected main.cpp)
 target_compile_definitions(main_protected PRIVATE PROTECTED_BUILD=1)
 
 # Platform-specific variants
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+if(UNIX)
     add_executable(main_execstack main.cpp)
     target_link_options(main_execstack PRIVATE "-z" "execstack")
     target_compile_definitions(main_execstack PRIVATE EXECSTACK_BUILD=1)
@@ -24,10 +24,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang
     add_executable(main_noprotect main.cpp)
     target_compile_options(main_noprotect PRIVATE "-fno-stack-protector")
     target_compile_definitions(main_noprotect PRIVATE NO_STACK_PROTECTOR=1)
-endif()
-
-# Windows-specific settings
-if(WIN32 AND MSVC)
+elseif(WIN32 AND MSVC)
     target_link_options(main PRIVATE "/NXCOMPAT" "/DYNAMICBASE")
     target_link_options(main_protected PRIVATE "/NXCOMPAT" "/DYNAMICBASE")
     
@@ -37,14 +34,21 @@ if(WIN32 AND MSVC)
 endif()
 
 # Custom targets
-add_custom_target(run
+add_custom_target(_dep
     COMMAND main
     DEPENDS main
 )
 
+if (WIN32)
+    set(EXIT VER>NUL)
+else()
+    set(EXIT true)
+endif()
+
+
+
 add_custom_target(test_aslr
-    COMMAND echo "=== Testing ASLR - Running 3 times ==="
-    COMMAND echo "n" | main || true
-    COMMAND echo "n" | main || true  
+    COMMAND echo "n" | main || EXIT
+    COMMAND echo "n" | main || EXIT  
     DEPENDS main
 )
